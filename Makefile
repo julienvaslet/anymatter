@@ -5,10 +5,8 @@ PYTHON=$(VENV_DIR)/bin/python
 
 .venv:
 	python -m venv $(VENV_DIR)
-	cp pip.conf $(VENV_DIR)/pip.conf
 
 install: .venv
-	export PIP_INDEX_URL=https://pypi.org/simple/
 	$(PYTHON) -m pip install -r requirements.txt
 
 run: install
