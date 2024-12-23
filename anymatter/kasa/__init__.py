@@ -1,0 +1,1 @@
+from anymatter.kasa.switch import KasaOnOffSwitch
