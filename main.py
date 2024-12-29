@@ -1,35 +1,22 @@
 import asyncio
+import logging
+import os
 
-from circuitmatter import CircuitMatter
-from circuitmatter.device_types.lighting import on_off
+from switchbotmeter import DevScanner
+
 from anymatter.kasa import KasaOnOffSwitch
-
-class LED(on_off.OnOffLight):
-    def __init__(self, name):
-        super().__init__(name)
-        self._value = False
-
-    def on(self):
-        self._value = True
-        print("ON")
-    
-    def off(self):
-        self._value = False
-        print("OFF")
+from anymatter.switchbot import SwitchbotMeterPlus
 
 async def main():
     device = KasaOnOffSwitch(ip="10.0.0.106")
     await device.run()
 
-def mattermain():
-    matter = CircuitMatter()
-    led = LED("led1")
-    matter.add_device(led)
-
-    while True:
-        matter.process_packets()
+async def main2():
+    device = SwitchbotMeterPlus(mac="ce:2a:85:c6:43:3c")
+    await device.run()
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
     #asyncio.run(main())
-    mattermain()
+    asyncio.run(main2())
