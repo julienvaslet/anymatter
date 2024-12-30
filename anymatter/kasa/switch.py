@@ -1,20 +1,37 @@
-from anymatter.device.switch import OnOffSwitch
+import logging
+from anymatter.device.capabilities import PowerControl
 from anymatter.kasa.device import KasaDevice
 
-class KasaOnOffSwitch(KasaDevice, OnOffSwitch):
-    def __init__(self, ip: str):
-        super().__init__(ip)
+logger = logging.getLogger(__name__)
+
+
+class KasaPowerControl(PowerControl):
+    def __init__(self, device: KasaDevice):
+        PowerControl.__init__(self)
+        self._device = device
 
     async def on(self):
-        if not self._device:
+        device = self._device.device
+
+        if not device:
             raise Exception("Device not connected")
 
-        await self._device.turn_on()
-        await self._device.update()
+        logger.info(f"Turning on {device.mac}...")
+        await device.turn_on()
+        await device.update()
 
     async def off(self):
-        if not self._device:
+        device = self._device.device
+
+        if not device:
             raise Exception("Device not connected")
 
-        await self._device.turn_off()
-        await self._device.update()
+        logger.info(f"Turning off {device.mac}...")
+        await device.turn_off()
+        await device.update()
+
+
+class KasaOnOffSwitch(KasaDevice):
+    def __init__(self, mac: str):
+        KasaDevice.__init__(self, mac)
+        self.add_capability(KasaPowerControl(self))

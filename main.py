@@ -8,7 +8,7 @@ from anymatter.kasa import KasaOnOffSwitch
 from anymatter.switchbot import SwitchbotMeterPlus
 
 async def main():
-    device = KasaOnOffSwitch(ip="10.0.0.106")
+    device = KasaOnOffSwitch(mac="dc:62:79:35:68:2a")
     await device.run()
 
 async def main2():
@@ -18,5 +18,5 @@ async def main2():
 
 if __name__ == "__main__":
     logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
-    #asyncio.run(main())
-    asyncio.run(main2())
+    asyncio.run(main())
+    #asyncio.run(main2())

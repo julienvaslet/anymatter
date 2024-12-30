@@ -1,20 +1,32 @@
+from __future__ import annotations
 import asyncio
 import logging
 from kasa import Discover
+from anymatter.device import Device
 
 logger = logging.getLogger(__name__)
 
-class KasaDevice:
-    def __init__(self, ip: str):
-        self._ip = ip
+
+class KasaDevice(Device):
+    def __init__(self, mac: str):
+        Device.__init__(self)
+        self._mac = mac
         self._device = None
+
+    @property
+    def device(self) -> KasaDevice:
+        return self._device
 
     async def connect(self) -> bool:
         self._device = None
-        logger.info(f"Connecting to Kasa device on IP {self._ip}...")
+        logger.info(f"Connecting to Kasa device {self._mac}...")
 
         try:
-            self._device = await Discover.discover_single(self._ip)
+            devices = await Discover.discover()
+            for device in devices.values():
+                if device.mac.lower() == self._mac.lower():
+                    self._device = device
+                    break
         except:
             pass
 

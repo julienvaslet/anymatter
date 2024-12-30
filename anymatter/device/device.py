@@ -1,15 +1,44 @@
 import asyncio
 import logging
+import qrcode
+from pathlib import Path
 from typing import List
 from circuitmatter import CircuitMatter
 from circuitmatter.device_types.simple_device import SimpleDevice
+from circuitmatter.pase import compute_qr_code
 from abc import ABC, abstractmethod
+from anymatter.device.capabilities import Capability
 
 logger = logging.getLogger(__name__)
 
+
 class Device(ABC):
-    def __init__(self):
+    def __init__(self, product_name="Anymatter device", product_id=0x1234, vendor_id=0xFFF4):
         self._connected = False
+        self._matter = None
+        self._capabilities = []
+        self._product_name = product_name
+        self._product_id = product_id
+        self._vendor_id = vendor_id
+
+    def _display_qr_code(self):
+        if not self._matter:
+            return
+        
+        encoded = compute_qr_code(self._vendor_id, self._product_id, self._matter.nonvolatile["discriminator"], self._matter.nonvolatile["passcode"])
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+
+        qr.add_data(f"MT:{encoded}")
+        qr.print_tty()
+    
+    def add_capability(self, capability: Capability):
+        self._capabilities.append(capability)
 
     async def run(self):
         logger.info("Connecting to the device...")
@@ -22,27 +51,29 @@ class Device(ABC):
         logger.info("Connected.")
         logger.info("Setting up Matter Device")
 
-        matter = CircuitMatter(
-            vendor_id=0xFFF4,
-            product_id=0x1234,
-            product_name="CircuitMatter Device"
+        state_filename = f"matter-device-states/{self._product_name.lower().replace(' ', '-')}.json"
+        Path(state_filename).parent.mkdir(parents=True, exist_ok=True)
+
+        self._matter = CircuitMatter(
+            vendor_id=self._vendor_id,
+            product_id=self._product_id,
+            product_name=self._product_name,
+            state_filename=state_filename
         )
 
-        for device in self._get_cm_devices():
-            matter.add_device(device)
+        for capability in self._capabilities:
+            self._matter.add_device(capability.get_circuitmatter_device())
 
         logger.info("Matter device is up.")
+        self._display_qr_code()
+
         while True:
             await self.update()
-            matter.process_packets()
+            self._matter.process_packets()
 
         await self.disconnect()
 
     async def update(self):
-        pass
-
-    @abstractmethod
-    def _get_cm_devices(self) -> List[SimpleDevice]:
         pass
 
     @abstractmethod
