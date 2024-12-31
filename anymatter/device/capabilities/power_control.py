@@ -1,3 +1,4 @@
+import logging
 from abc import abstractmethod
 from circuitmatter.clusters.general.identify import Identify
 from circuitmatter.clusters.general.on_off import OnOff
@@ -5,6 +6,8 @@ from circuitmatter.device_types.simple_device import SimpleDevice
 
 from anymatter.asyncio import await_coroutine
 from anymatter.device.capabilities.capability import Capability
+
+logger = logging.getLogger(__name__)
 
 
 class PowerControl(Capability):
@@ -24,28 +27,32 @@ class PowerControl(Capability):
             self._on_off.off = self._off
             self.servers.append(self._on_off)
             
-        
         def set_status(self, value: bool):
-            self._on_off.on_off = value
+            if value != self._on_off.OnOff:
+                self._on_off.OnOff = value
+                status = "on" if value else "off"
+                logger.info(f"{self.name} has been turned {status}.")
         
         def _on(self, *args):
-            print("ONNN")
+            logger.info(f"Turning on {self.name}...")
+
             try:
                 await_coroutine(self._capability.on())
-                print("ONNN GOOOOD")
                 self.set_status(True)
+
             except Exception as e:
-                print("EXCEEEEPT", e)
+                logger.error(f"An error has occured while turning {self.name} on: {e}")
                 pass
         
         def _off(self, *args):
-            print("OFFFFF")
+            logger.info(f"Turning off {self.name}...")
+
             try:
                 await_coroutine(self._capability.off())
-                print("OFFFF GOOOD")
                 self.set_status(False)
+
             except Exception as e:
-                print("EXCEEEEPT", e)
+                logger.error(f"An error has occured while turning {self.name} off: {e}")
                 pass
         
 

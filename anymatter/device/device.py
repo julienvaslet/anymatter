@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import qrcode
+import sys
 from pathlib import Path
 from typing import List
 from circuitmatter import CircuitMatter
@@ -35,7 +36,11 @@ class Device(ABC):
         )
 
         qr.add_data(f"MT:{encoded}")
-        qr.print_tty()
+
+        if sys.stdout.isatty():
+            qr.print_tty()
+        else:
+            qr.print_ascii()
     
     def add_capability(self, capability: Capability):
         self._capabilities.append(capability)
@@ -68,6 +73,7 @@ class Device(ABC):
         self._display_qr_code()
 
         while True:
+            # TODO: Refresh rate
             await self.update()
             self._matter.process_packets()
 
