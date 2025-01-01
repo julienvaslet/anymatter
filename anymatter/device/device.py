@@ -74,12 +74,12 @@ class Device(ABC):
 
         while True:
             # TODO: Refresh rate
-            await self.update()
+            await self.refresh()
             self._matter.process_packets()
 
         await self.disconnect()
 
-    async def update(self):
+    async def refresh(self):
         pass
 
     @abstractmethod

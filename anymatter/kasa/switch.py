@@ -37,7 +37,7 @@ class KasaOnOffSwitch(KasaDevice):
         self._power_control = KasaPowerControl(self)
         self.add_capability(self._power_control)
 
-    async def update(self):
+    async def refresh(self):
         if not self.device:
             return
         

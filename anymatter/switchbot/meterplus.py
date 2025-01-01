@@ -14,7 +14,7 @@ class SwitchbotMeterPlus(TemperatureSensor):
     async def disconnect(self):
         pass
 
-    async def update(self):
+    async def refresh(self):
         value = self.get_value()
 
         if value is not None:
