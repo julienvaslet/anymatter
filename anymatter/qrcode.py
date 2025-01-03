@@ -1,8 +1,9 @@
 import qrcode
 import io
-import sys
+from math import floor
 
-def print_qr_code(data, out=sys.stdout):
+
+def print_qr_code(data, description=None, padding=8):
     """Create the QRCode, print it with # 2x bigger to make it readable with Apple Home."""
 
     stream = io.StringIO()
@@ -11,7 +12,7 @@ def print_qr_code(data, out=sys.stdout):
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
-        border=4,
+        border=0,
     )
 
     qr.add_data(data)
@@ -32,5 +33,20 @@ def print_qr_code(data, out=sys.stdout):
     
     stream.close()
 
-    for line in qr_data:
-        print("".join(line), file=out)
+    qr_data = [" " * padding + "".join(line) + " " * padding for line in qr_data]
+    qr_width = len(qr_data[0])
+    qr_text = "\n" * floor(padding / 2) + "\n".join(qr_data).rstrip() + "\n" * floor(padding / 2)
+
+    print(qr_text)
+    
+    if description:
+        for line in description.split("\n"):
+            line_length = len(line)
+
+            if (line_length < qr_width):
+                left_padding = " " * (floor((qr_width - line_length) / 2))
+                line = f"{left_padding}{line}"
+
+            print(line)
+        
+        print("\n")
