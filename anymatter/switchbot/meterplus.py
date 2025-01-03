@@ -1,4 +1,4 @@
-from anymatter.device.temperature import TemperatureSensor
+from anymatter.matter.temperature import TemperatureSensor
 from switchbotmeter import DevScanner
 
 

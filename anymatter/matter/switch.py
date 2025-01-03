@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List
 from circuitmatter.device_types.simple_device import SimpleDevice
 from circuitmatter.device_types.lighting import on_off
-from anymatter.device.device import Device
+from anymatter.matter.device import Device
 
 
 class MatterSwitch(on_off.OnOffLight):

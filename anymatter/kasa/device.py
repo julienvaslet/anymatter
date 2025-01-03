@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from kasa import Discover
-from anymatter.device import Device
+from anymatter.matter import Device
 
 logger = logging.getLogger(__name__)
 

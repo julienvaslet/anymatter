@@ -5,7 +5,7 @@ from circuitmatter.clusters.general.on_off import OnOff
 from circuitmatter.device_types.simple_device import SimpleDevice
 
 from anymatter.asyncio import await_coroutine
-from anymatter.device.capabilities.capability import Capability
+from anymatter.matter.capabilities.capability import Capability
 
 logger = logging.getLogger(__name__)
 

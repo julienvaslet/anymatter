@@ -3,7 +3,7 @@ from typing import List
 from circuitmatter.data_model import Cluster, NumberAttribute
 from circuitmatter.clusters.general.identify import Identify
 from circuitmatter.device_types.simple_device import SimpleDevice
-from anymatter.device.device import Device
+from anymatter.matter.device import Device
 
 logger = logging.getLogger(__name__)
 

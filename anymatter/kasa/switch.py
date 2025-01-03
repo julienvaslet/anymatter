@@ -1,5 +1,5 @@
 import logging
-from anymatter.device.capabilities import PowerControl
+from anymatter.matter.capabilities import PowerControl
 from anymatter.kasa.device import KasaDevice
 
 logger = logging.getLogger(__name__)
