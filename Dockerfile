@@ -16,6 +16,6 @@ COPY main.py /app
 COPY anymatter /app/anymatter
 COPY matter-device-state.json /app
 
-CMD dbus-daemon --system && \
-    avahi-daemon -D && \
-    python -u main.py
+RUN printf '#!/bin/bash\ndbus-daemon --system\navahi-daemon -D\npython -u main.py\n' > /app/start.sh && chmod +x /app/start.sh
+
+ENTRYPOINT [ "/app/start.sh" ]
