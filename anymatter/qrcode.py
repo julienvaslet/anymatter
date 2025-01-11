@@ -1,6 +1,9 @@
 import qrcode
 import io
+import logging
 from math import floor
+
+logger = logging.getLogger(__name__)
 
 
 def print_qr_code(data, description=None, padding=8):
@@ -36,9 +39,9 @@ def print_qr_code(data, description=None, padding=8):
     qr_data = [" " * padding + "".join(line) + " " * padding for line in qr_data]
     qr_width = len(qr_data[0])
     qr_text = "\n" * floor(padding / 2) + "\n".join(qr_data).rstrip() + "\n" * floor(padding / 2)
-
-    print(qr_text)
     
+    output = [qr_text]
+
     if description:
         for line in description.split("\n"):
             line_length = len(line)
@@ -47,6 +50,8 @@ def print_qr_code(data, description=None, padding=8):
                 left_padding = " " * (floor((qr_width - line_length) / 2))
                 line = f"{left_padding}{line}"
 
-            print(line)
+            output.append(line)
         
-        print("\n")
+        output.append("\n")
+    
+    logger.info("\n".join(output))

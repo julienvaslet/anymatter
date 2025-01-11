@@ -1,4 +1,14 @@
 FROM python:3.11-slim
+LABEL org.opencontainers.image.authors="Julien Vaslet"
+LABEL org.opencontainers.image.url="https://github.com/julienvaslet/anymatter"
+LABEL org.opencontainers.image.documentation="https://github.com/julienvaslet/anymatter"
+LABEL org.opencontainers.image.source="https://github.com/julienvaslet/anymatter"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.ref.name="anymatter"
+LABEL org.opencontainers.image.title="Anymatter"
+LABEL org.opencontainers.image.description="A virtual Matter hub for connecting any device"
+LABEL org.opencontainers.image.version="0.1.0"
+
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -26,6 +36,7 @@ RUN cp /app/anymatter/circuitmatter-print.py $(python -m pip show circuitmatter 
 # For development purposes
 COPY matter-device-state.json /app
 
-RUN printf '#!/bin/bash\ndbus-daemon --system\navahi-daemon -D\npython -u main.py\n' > /app/start.sh && chmod +x /app/start.sh
+RUN printf '#!/bin/bash\ndbus-daemon --system\navahi-daemon -D\npython main.py $(echo "$*")\n' > /app/start.sh && chmod +x /app/start.sh
 
-ENTRYPOINT [ "/app/start.sh" ]
+ENV COMMAND_LINE="-d Kasa/dc:62:79:35:68:2a/Office-Light -d Switchbot/ce:2a:85:c6:43:3c/Office-sensor -d Switchbot/ce:2a:86:46:36:88/Bedroom-sensor -d Switchbot/d0:c8:41:06:21:47/Outdoor-sensor"
+ENTRYPOINT [ "/bin/bash", "-c", "/app/start.sh \"$COMMAND_LINE\"" ]
