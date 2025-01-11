@@ -12,6 +12,8 @@ class KasaDevice(Device):
         Device.__init__(self, mac)
         self._mac = mac
         self._device = None
+        self.vendor_name = "TP-Link Systems Inc."
+        self.vendor_id = 0x1391
 
     @property
     def device(self) -> KasaDevice:

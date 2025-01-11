@@ -12,6 +12,8 @@ async def main():
     hub = Hub()
     hub.add_device(KasaOnOffSwitch(mac="dc:62:79:35:68:2a"))
     hub.add_device(SwitchbotMeterPlus(mac="ce:2a:85:c6:43:3c"))
+    # ce:2a:86:46:36:88 ble
+    # d0:c8:41:06:21:47 ble
 
     def shutdown(signalnum, frame):
         hub.shutdown()
@@ -21,5 +23,5 @@ async def main():
     await hub.run()
 
 if __name__ == "__main__":
-    logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+    logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
     asyncio.run(main())

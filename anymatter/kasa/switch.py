@@ -9,6 +9,8 @@ class KasaPowerControl(PowerControl):
     def __init__(self, device: KasaDevice):
         PowerControl.__init__(self, device.name)
         self._device = device
+        self._device.product_id = 0x0201
+        self._device.product_name = "HS201"
 
     async def on(self):
         device = self._device.device

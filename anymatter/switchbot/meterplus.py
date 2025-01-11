@@ -7,6 +7,8 @@ class SwitchbotMeterPlus(Device):
     def __init__(self, mac: str):
         super().__init__(mac)
         self._mac = mac
+        self.vendor_id = 0x1397
+        self.vendor_name = "Switchbot"
         self._scanner = DevScanner(macs=[self._mac])
         
         self._temperature = TemperatureSensing()

@@ -28,12 +28,28 @@ class Device(SimpleDevice):
         self.servers.append(self._bridged_device)
 
     @property
+    def vendor_id(self):
+        return self._bridged_device.vendor_id
+    
+    @vendor_id.setter
+    def vendor_id(self, value: str):
+        self._bridged_device.vendor_id = value
+
+    @property
     def vendor_name(self):
         return self._bridged_device.vendor_name
     
     @vendor_name.setter
     def vendor_name(self, value: str):
-        self._bridged_device.vendor_name = vendor_name
+        self._bridged_device.vendor_name = value
+
+    @property
+    def product_id(self):
+        return self._bridged_device.product_id
+    
+    @product_id.setter
+    def product_id(self, value: str):
+        self._bridged_device.product_id = value
 
     @property
     def product_name(self):
@@ -41,7 +57,7 @@ class Device(SimpleDevice):
     
     @product_name.setter
     def product_name(self, value: str):
-        self._bridged_device.product_name = product_name
+        self._bridged_device.product_name = value
 
     def _register_device_type(self, device_type_id: int, revision: int): 
         device_type = descriptor.DescriptorCluster.DeviceTypeStruct()
