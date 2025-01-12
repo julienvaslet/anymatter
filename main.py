@@ -7,12 +7,13 @@ import sys
 from argparse import ArgumentParser
 from collections import namedtuple
 from typing import List
+
 from anymatter.matter import Hub
-from anymatter.kasa import KasaOnOffSwitch
-from anymatter.switchbot import SwitchbotMeterPlus
+from anymatter.kasa import find_kasa_device
+from anymatter.switchbot import find_switchbot_device
 
 
-Device = namedtuple("Device", "model mac name")
+Device = namedtuple("Device", "model mac label")
 
 class Config:
     devices: List[Device] = []
@@ -40,8 +41,8 @@ def parse_args(args) -> Config:
 
 async def main(devices: List[Device]):
     devices_resolver = {
-        "kasa": KasaOnOffSwitch,
-        "switchbot": SwitchbotMeterPlus,
+        "kasa": find_kasa_device,
+        "switchbot": find_switchbot_device,
     }
 
     hub = Hub()
@@ -52,8 +53,7 @@ async def main(devices: List[Device]):
         if not model in devices_resolver:
             raise Exception(f"Unsupported device brand/model \"{device.model}\".")
 
-        # TODO: Use real resolvers and label
-        hub.add_device(devices_resolver[model](mac=device.mac))
+        hub.add_device(devices_resolver[model](mac=device.mac, label=device.label))
 
     def shutdown(signalnum, frame):
         hub.shutdown()
