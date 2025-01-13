@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Device(SimpleDevice):
-    def __init__(self, name: str, refresh_rate_ms=1000):
+    def __init__(self, name: str, label: str = "", refresh_rate_ms=1000):
         SimpleDevice.__init__(self, name)
         self._connected = False
         self._capabilities = []
@@ -25,6 +25,7 @@ class Device(SimpleDevice):
         self._last_refresh_ms = 0
 
         self._bridged_device = BridgedDeviceBasicInformationCluster()
+        self._bridged_device.node_label = label
         self.servers.append(self._bridged_device)
 
     @property

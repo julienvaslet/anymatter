@@ -34,8 +34,8 @@ class KasaPowerControl(PowerControl):
 
 
 class KasaOnOffSwitch(KasaDevice):
-    def __init__(self, mac: str):
-        KasaDevice.__init__(self, mac)
+    def __init__(self, mac: str, label: str):
+        KasaDevice.__init__(self, mac, label)
         self._power_control = KasaPowerControl(self)
         self.add_capability(self._power_control)
 

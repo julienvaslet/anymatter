@@ -4,11 +4,12 @@ from switchbotmeter import DevScanner
 
 
 class SwitchbotMeterPlus(Device):
-    def __init__(self, mac: str):
-        super().__init__(mac)
+    def __init__(self, mac: str, label: str):
+        Device.__init__(self, mac, label)
         self._mac = mac
         self.vendor_id = 0x1397
         self.vendor_name = "Switchbot"
+        # TODO: Dev scanner seems to slow matter communication, aggregate?
         self._scanner = DevScanner(macs=[self._mac])
         
         self._temperature = TemperatureSensing()
@@ -33,7 +34,6 @@ class SwitchbotMeterPlus(Device):
             self._humidity.value = humidity
     
     def get_values(self):
-        # need root capability for "ble on", look at setcap command
         for device in next(self._scanner):
             if device.mac != self._mac:
                 continue

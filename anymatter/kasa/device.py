@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class KasaDevice(Device):
-    def __init__(self, mac: str):
-        Device.__init__(self, mac)
+    def __init__(self, mac: str, label: str):
+        Device.__init__(self, mac, label)
         self._mac = mac
         self._device = None
         self.vendor_name = "TP-Link Systems Inc."
@@ -31,6 +31,19 @@ class KasaDevice(Device):
                     break
         except:
             pass
+
+        # DeviceInfo(
+        #     short_name='HS103',
+        #     long_name='HS103',
+        #     brand='kasa',
+        #     device_family='IOT.SMARTPLUGSWITCH',
+        #     device_type=<DeviceType.Plug: 'plug'>,
+        #     hardware_version='5.0',
+        #     firmware_version='1.0.13',
+        #     firmware_build='Build 240117 Rel.162355',
+        #     requires_auth=False,
+        #     region='US'
+        # )
 
         return self._device is not None
 

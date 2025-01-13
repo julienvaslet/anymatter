@@ -53,7 +53,7 @@ async def main(devices: List[Device]):
         if not model in devices_resolver:
             raise Exception(f"Unsupported device brand/model \"{device.model}\".")
 
-        hub.add_device(devices_resolver[model](mac=device.mac, label=device.label))
+        hub.add_device(await devices_resolver[model](mac=device.mac, label=device.label))
 
     def shutdown(signalnum, frame):
         hub.shutdown()

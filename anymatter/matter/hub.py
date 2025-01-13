@@ -10,9 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class Hub:
-    def __init__(self):
+    def __init__(self, label: str = "Anymatter Hub"):
         self._matter = None
         self._running = True
+        self._label = label
         self._product_name = "Anymatter Hub"
         self._vendor_id = 0xFFF4  # Hardcoded for circuitmatter purposes
         self._product_id = 0x1234  # Hardcoded for circuitmatter purposes
@@ -78,7 +79,7 @@ class Hub:
         basic_information.vendor_name = "Anymatter"
         basic_information.product_id = 0x0482  # -HUB
         basic_information.product_name = "Anymatter Hub"
-        basic_information.node_label = "Anymatter Hub"
+        basic_information.node_label = self._label
         basic_information.hardware_version_string = __version__
         basic_information.software_version_string = __version__
         basic_information.product_url = "https://github.com/julienvaslet/anymatter"
