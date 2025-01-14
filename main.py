@@ -12,6 +12,8 @@ from anymatter.matter import Hub
 from anymatter.kasa import find_kasa_device
 from anymatter.switchbot import find_switchbot_device
 
+logger = logging.getLogger(__name__)
+
 
 Device = namedtuple("Device", "model mac label")
 
@@ -53,7 +55,13 @@ async def main(devices: List[Device]):
         if not model in devices_resolver:
             raise Exception(f"Unsupported device brand/model \"{device.model}\".")
 
-        hub.add_device(await devices_resolver[model](mac=device.mac, label=device.label))
+        matter_device = await devices_resolver[model](mac=device.mac, label=device.label)
+
+        if not matter_device:
+            logger.warning(f"Unable to find \"{device.model}/{device.mac}/{device.label}\", ignoring device...")
+            continue
+
+        hub.add_device(matter_device)
 
     def shutdown(signalnum, frame):
         hub.shutdown()

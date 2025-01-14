@@ -1,6 +1,5 @@
 from anymatter.matter import Device
 from anymatter.matter.capabilities import TemperatureSensing, RelativeHumiditySensing
-from switchbotmeter import DevScanner
 
 
 class SwitchbotMeterPlus(Device):
@@ -9,8 +8,6 @@ class SwitchbotMeterPlus(Device):
         self._mac = mac
         self.vendor_id = 0x1397
         self.vendor_name = "Switchbot"
-        # TODO: Dev scanner seems to slow matter communication, aggregate?
-        self._scanner = DevScanner(macs=[self._mac])
         
         self._temperature = TemperatureSensing()
         self.add_capability(self._temperature)
@@ -24,20 +21,12 @@ class SwitchbotMeterPlus(Device):
     async def disconnect(self):
         pass
 
-    async def refresh(self):
-        temperature, humidity = self.get_values()
+    def update(self, ble_device):
+        # TODO: implement last udpate, then reachable with timeout?
 
-        if temperature is not None:
-            self._temperature.value = temperature
-
-        if humidity is not None:
-            self._humidity.value = humidity
-    
-    def get_values(self):
-        for device in next(self._scanner):
-            if device.mac != self._mac:
-                continue
-
-            return [device.temp, device.humidity]
+        if ble_device.temp:
+            self._temperature.value = ble_device.temp
         
-        return [None, None]
+        if ble_device.temp:
+            self._humidity.value = ble_device.humidity
+

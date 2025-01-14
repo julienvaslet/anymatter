@@ -64,7 +64,6 @@ class Hub:
         self._matter.root_node.descriptor.DeviceTypeList[0].DeviceType = 0x000e
         self._matter.root_node.descriptor.DeviceTypeList[0].Revision = 1
 
-        # Bridge??
         basic_information = None
         for server in self._matter.root_node.servers:
             if isinstance(server, BasicInformationCluster):
@@ -74,7 +73,7 @@ class Hub:
         if not basic_information:
             raise Exception("Unable to correctly set up matter device's root node.")
 
-        basic_information.feature_map = 0x01
+        basic_information.feature_map = 0x01  # Bridge feature map
         basic_information.vendor_id = 0x0269  # -ANY
         basic_information.vendor_name = "Anymatter"
         basic_information.product_id = 0x0482  # -HUB
