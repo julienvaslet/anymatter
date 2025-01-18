@@ -60,6 +60,14 @@ class Device(SimpleDevice):
     def product_name(self, value: str):
         self._bridged_device.product_name = value
 
+    @property
+    def reachable(self):
+        return self._bridged_device.reachable
+    
+    @reachable.setter
+    def reachable(self, value: bool):
+        self._bridged_device.reachable = value
+
     def _register_device_type(self, device_type_id: int, revision: int): 
         device_type = descriptor.DescriptorCluster.DeviceTypeStruct()
         device_type.DeviceType = device_type_id

@@ -1,3 +1,4 @@
+import time
 from anymatter.matter import Device
 from anymatter.matter.capabilities import TemperatureSensing, RelativeHumiditySensing
 
@@ -8,6 +9,8 @@ class SwitchbotMeterPlus(Device):
         self._mac = mac
         self.vendor_id = 0x1397
         self.vendor_name = "Switchbot"
+        self._last_update_ms = None
+        self._timeout_ms = 10000
         
         self._temperature = TemperatureSensing()
         self.add_capability(self._temperature)
@@ -21,8 +24,15 @@ class SwitchbotMeterPlus(Device):
     async def disconnect(self):
         pass
 
+    async def refresh(self):
+        current_time_ms = round(time.time() * 1000)
+
+        if self._last_update_ms is None or self._last_update_ms + self._timeout_ms < current_time_ms:
+            self.reachable = False
+
     def update(self, ble_device):
-        # TODO: implement last udpate, then reachable with timeout?
+        self._last_update_ms = round(time.time() * 1000)
+        self.reachable = True
 
         if ble_device.temp:
             self._temperature.value = ble_device.temp
