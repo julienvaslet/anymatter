@@ -1,4 +1,5 @@
 import asyncio
+import configparser
 import logging
 import os
 import re
@@ -25,6 +26,7 @@ class Config:
 def parse_args(args) -> Config:
     parser = ArgumentParser(prog="anymatter")
     parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-c", "--config", default=None)
     parser.add_argument("-d", "--device", action="append", default=[], dest="devices")
     options = parser.parse_args(args)
 
@@ -32,6 +34,27 @@ def parse_args(args) -> Config:
 
     if options.verbose:
         config.loglevel = "DEBUG"
+
+    mac_re = re.compile(r"^[A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2}){5}$")
+
+    if options.config is not None:
+        devices_config = configparser.ConfigParser()
+        devices_config.read(options.config)
+
+        for section in devices_config.sections():
+            if not re.match(mac_re, section):
+                print(f"Ignoring section [{section}]: not a mac address.")
+                continue
+            
+            if "model" not in devices_config[section]:
+                print(f"Ignoring section [{section}]: missing \"model\" parameter.")
+                continue
+
+            config.devices.append(Device(
+                devices_config[section]["model"],
+                section,
+                devices_config[section]["label"] if "label" in devices_config[section] else None
+            ))
 
     device_re = re.compile(r"^(?P<model>[^/]+)/(?P<mac>[A-Fa-f0-9]{2}(?::[A-Fa-f0-9]{2}){5})(?:/(?P<label>.*))?$")
 

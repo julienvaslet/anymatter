@@ -39,9 +39,10 @@ COPY matter-device-state.json /app
 RUN <<EOR
     cat > /app/start.sh <<EOF
 #!/bin/bash
+set -e
 dbus-daemon --system
 avahi-daemon -D
-python main.py $(echo "$*")
+python main.py $(echo "\$@")
 EOF
     chmod +x /app/start.sh
 EOR
@@ -66,5 +67,5 @@ label=Outdoor Sensor
 EOF
 EOR
 
-ENV COMMAND_LINE="-d Kasa/dc:62:79:35:68:2a/Office-Light -d Switchbot/ce:2a:85:c6:43:3c/Office-sensor -d Switchbot/ce:2a:86:46:36:88/Bedroom-sensor -d Switchbot/d0:c8:41:06:21:47/Outdoor-sensor"
-ENTRYPOINT [ "/bin/bash", "-c", "/app/start.sh \"$COMMAND_LINE\"" ]
+ENTRYPOINT [ "/app/start.sh" ]
+CMD [ "--config", "/app/devices.config" ]
