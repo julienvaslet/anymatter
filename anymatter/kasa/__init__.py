@@ -1,12 +1,12 @@
 import logging
 from kasa import Discover, DeviceType
+from anymatter.finder import DeviceFinder
 from anymatter.kasa.switch import KasaOnOffSwitch
 
 logger = logging.getLogger(__name__)
 
-
-class KasaDeviceFinder():
-    _instance = None
+# TODO: Outlet/Plug vs Light vs WallSwitch
+class KasaDeviceFinder(DeviceFinder):
     _devicesTypes = {
         DeviceType.Plug: KasaOnOffSwitch,
         DeviceType.Bulb: KasaOnOffSwitch,
@@ -16,31 +16,28 @@ class KasaDeviceFinder():
     }
 
     def __init__(self):
-        # TODO: persist found and identified device type/mac for faster boot
-        self._found_devices = []
+        DeviceFinder.__init__(self)
     
     async def find(self, mac: str, label: str):
-        device = None
-        devices = await Discover.discover()
-        for dev in devices.values():
-            if dev.mac.lower() != mac.lower():
-                continue
+        mac = mac.lower()
+        device_type = self.from_cache(mac)
+
+        if not device_type:
+            devices = await Discover.discover()
+
+            for dev in devices.values():
+                self.cache(dev.mac.lower(), dev.device_type)
+
+                if dev.mac.lower() != mac:
+                    continue
             
-            if dev.device_type not in KasaDeviceFinder._devicesTypes:
-                logger.warn(f"Kasa {dev.device_type} not supported.")
-                break
+                device_type = dev.device_type
+    
+        if device_type not in KasaDeviceFinder._devicesTypes:
+            logger.warn(f"Kasa {device_type} not supported.")
+            return None
 
-            device = KasaDeviceFinder._devicesTypes[dev.device_type](mac.lower(), label)
-            break
-
-        return device
-
-    @staticmethod
-    def get():
-        if not KasaDeviceFinder._instance:
-            KasaDeviceFinder._instance = KasaDeviceFinder()
-        
-        return KasaDeviceFinder._instance
+        return KasaDeviceFinder._devicesTypes[device_type](mac, label)
 
 
 async def find_kasa_device(mac: str, label: str):

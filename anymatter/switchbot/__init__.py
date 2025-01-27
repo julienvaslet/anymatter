@@ -1,25 +1,44 @@
 import logging
-from anymatter.switchbot.meterplus import SwitchbotMeterPlus
 from anymatter.ble import BleListener
+from anymatter.finder import DeviceFinder
+from anymatter.switchbot.meterplus import SwitchbotMeterPlus
 
 logger = logging.getLogger(__name__)
 
 
-async def find_switchbot_device(mac: str, label: str):
-    mac = mac.lower()
-    ble_device = await BleListener.get().find_device(mac)
+class SwitchbotDeviceFinder(DeviceFinder):
+    _devicesTypes = {
+        "Meter": SwitchbotMeterPlus,
+    }
 
-    if ble_device is None:
-        logger.warning(f"Switchbot device \"{mac}\" not found.")
-        return None
+    def __init__(self):
+        DeviceFinder.__init__(self)
     
-    # Not ideal, to investigate
-    if not ble_device.data:
-        logger.warning(f"Switchbot device \"{mac}\" not supported.")
-        return None
+    async def find(self, mac: str, label: str):
+        mac = mac.lower()
+        device_type = self.from_cache(mac)
 
-    matter_device = SwitchbotMeterPlus(mac, label)
-    matter_device.update(ble_device)
-    BleListener.get().register(mac, matter_device.update)
+        if not device_type:
+            ble_device = await BleListener.get().find_device(mac)
 
-    return matter_device
+            if ble_device is None:
+                logger.warning(f"Switchbot device \"{mac}\" not found.")
+                return None
+            
+            # Not ideal, to investigate
+            if not ble_device.data:
+                logger.warning(f"Switchbot device \"{mac}\" not supported.")
+                return None
+            
+            # Only Meter device are supported for now
+            device_type = "Meter"
+            self.cache(mac, device_type)
+
+        matter_device = SwitchbotDeviceFinder._devicesTypes[device_type](mac, label)
+        BleListener.get().register(mac, matter_device.update)
+
+        return matter_device
+
+
+async def find_switchbot_device(mac: str, label: str):
+    return await SwitchbotDeviceFinder.get().find(mac, label)
