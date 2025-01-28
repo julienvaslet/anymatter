@@ -58,6 +58,7 @@ class Hub:
             vendor_id=self._vendor_id,
             product_id=self._product_id,
             product_name=self._product_name,
+            state_filename="/data/matter-device-state.json",
         )
 
         # Force the root device type to be an Aggregator (not a PowerSource)

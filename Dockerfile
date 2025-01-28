@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p /var/run/dbus && \
     dbus-uuidgen > /var/lib/dbus/machine-id
 
+RUN mkdir /{app,data}
 WORKDIR /app
 
 COPY requirements.txt /app
@@ -33,9 +34,6 @@ COPY anymatter /app/anymatter
 # Provide the print wrapper to circuitmatter library
 RUN cp /app/anymatter/circuitmatter-print.py $(python -m pip show circuitmatter | grep Location | cut -f2 -d':')/circuitmatter/print.py
 
-# For development purposes
-COPY matter-device-state.json /app
-
 RUN <<EOR
     cat > /app/start.sh <<EOF
 #!/bin/bash
@@ -47,25 +45,5 @@ EOF
     chmod +x /app/start.sh
 EOR
 
-RUN <<EOR
-    cat > "/app/devices.config" <<EOF
-[dc:62:79:35:68:2a]
-model=Kasa
-label=Office Light
-
-[ce:2a:85:c6:43:3c]
-model=Switchbot
-label=Office Sensor
-
-[ce:2a:86:46:36:88]
-model=Switchbot
-label=Bedroom Sensor
-
-[d0:c8:41:06:21:47]
-model=Switchbot
-label=Outdoor Sensor
-EOF
-EOR
-
 ENTRYPOINT [ "/app/start.sh" ]
-CMD [ "--config", "/app/devices.config" ]
+CMD [ "--config", "/data/devices.config" ]
